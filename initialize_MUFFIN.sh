@@ -10,14 +10,7 @@ echo "installation directory is $BASEDIR"
 # initialize hybrid folder structure (optional)
 mkdir -p hybrid
 cd hybrid/
-mkdir -p hydro.in
-mkdir -p hydro.out
-mkdir -p sampler.in
-mkdir -p sampler.out
-mkdir -p smash.in
-mkdir -p smash.out
 mkdir -p scripts
-mkdir -p jobs
 mkdir -p hydrologs
 cd ../
 
@@ -30,10 +23,15 @@ cd ../
 
 # download EoS tables
 git clone https://github.com/yukarpenko/vhlle_params.git
+# use a specific branch for MUFFIN
+cd vhlle_params
+git checkout muffin
+cd ..
 #mv vhlle_params/eos hybrid/
 cd hybrid
 ln -s ../vhlle_params/eos eos
 ln -s ../vhlle_params/ic ic
+ln -s ../vhlle_params/tables tables
 cd ..
 
 # install pythia
