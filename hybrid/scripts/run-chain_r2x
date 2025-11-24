@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#PBS -l select=1:ncpus=1:mem=12gb:os=debian12
+#PBS -l walltime=23:59:00
+#PBS -N sims-low-energies
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Define relative paths and convert to absolute paths
+export SMASH_DIR="$(cd "${SCRIPT_DIR}/../../smash" && pwd)"
+ROOTDIR="$(cd "${SCRIPT_DIR}/../../hybrid" && pwd)"
+
+# !!! $PREFIX is set by the qsub -v "..."
+HYDRO_PARAMS=data/${PREFIX}/hydro_config
+if [ -n "${SUFFIX}" ]; then
+ PREFIX=${PREFIX}_${SUFFIX}
+fi
+
+HYDRO=on
+SAMPLER=on
+SMASH=on
+LOOPS=2  # number of loops to generate hadronic events
+
+cd $ROOTDIR
+
+if [ $HYDRO == "on" ]; then
+time ../vhlle/hlle_visc -params $HYDRO_PARAMS -outputDir data/${PREFIX}/hydro.output > hydrologs/${PREFIX}
+cp -a $HYDRO_PARAMS data/${PREFIX}/hydro.output
+# ---- combining freeze-out outputs from 3 fluids
+cd data/${PREFIX}/hydro.output
+cat freezeout_p.dat freezeout_t.dat freezeout_f.dat > f.all.dat
+cd $ROOTDIR
+fi
+
+for iloop in $(seq 1 $LOOPS)
+do
+(
+if [ $SAMPLER == "on" ]; then
+PREFIX_SAMPL=data/${PREFIX}/sampler.output/${iloop}
+PREFIX_SMASH=data/${PREFIX}/smash.output/${iloop}
+time ../smash-hadron-sampler/build/sampler events 1 --parameters data/${PREFIX}/sampler_config --surface data/${PREFIX}/hydro.output/f.all.dat --output ${PREFIX_SAMPL}
+echo "sampler execution time above"
+# ---- renaming the output file
+cd ${PREFIX_SAMPL}
+###mv particle_lists.oscar particle_lists_0  ### <<< not needed anymore, because Python script below does it.
+cd $ROOTDIR
+python3 add_spectators.py --sampled_particle_list ${PREFIX_SAMPL}/particle_lists.oscar --spectator_list data/${PREFIX}/hydro.output/spectators.dat --output ${PREFIX_SAMPL}/particle_lists_0
+fi
+
+if [ $SMASH == "on" ]; then
+time ../smash/build/smash -i data/${PREFIX}/smash_config -c 'Modi: { List: { File_Directory: '"${PREFIX_SAMPL}/"' } }' -o ${PREFIX_SMASH}/ -f
+echo "SMASH execution time above"
+fi
+) &
+done  # end of hadronic event generation loop
+
+wait
