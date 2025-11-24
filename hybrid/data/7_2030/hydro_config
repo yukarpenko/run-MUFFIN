@@ -1,0 +1,57 @@
+nevents 1000
+snn 7.7
+b_min 6.48
+b_max 7.95
+projA  197
+targA  197
+projZ  79
+targZ  79
+
+! EoS type: 0 = Laine_nf3.dat, 1 = chiral eos, 2 = AZH, eosFile is actually useless
+eosType       1
+eosFile         Laine_nf3.dat
+eosTypeHadron 2
+chiBfile        chiB.txt
+chiSfile        chiS.txt
+T_ch          0.165
+mu_b          0.0285
+mu_q         -0.001
+mu_s          0.007
+gammaS        0.935
+gammaFactor   0.75
+exclVolume    0.0
+
+etaS      0.0
+zetaS     0.0
+etaSparam  4
+zetaSparam  0
+e_crit    0.5
+
+nx        121
+ny        121
+nz        161
+xmin     -18.0
+xmax      18.0
+ymin     -18.0
+ymax      18.0
+etamin -1.5
+etamax 1.5
+
+glauberVar 1
+s0ScaleFactor  53.55
+epsilon0   30.0
+Rg      1.0
+tau0 5.0
+tauMax 25.0
+dtau       0.05
+adaptiveTimestep 1
+xi_fa      0.1
+frictionModel 4
+formationTime  0.0
+xi_q       30.0
+xi_h       1.0
+alpha     0.8
+beta      0.1
+xsectparam 14
+tau_unification 0.2
+unification 1
