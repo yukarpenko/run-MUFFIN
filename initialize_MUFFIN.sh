@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# folder in which the model will be initialized
-#cd ..
-mkdir -p muffin
-cd muffin
 BASEDIR=`pwd`
 echo "installation directory is $BASEDIR"
 
