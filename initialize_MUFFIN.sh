@@ -4,7 +4,6 @@ BASEDIR=`pwd`
 echo "installation directory is $BASEDIR"
 
 # initialize hybrid folder structure (optional)
-mkdir -p hybrid
 cd hybrid/
 mkdir -p scripts
 mkdir -p hydrologs
